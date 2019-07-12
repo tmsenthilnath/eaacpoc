@@ -1,151 +1,148 @@
 provider "azurerm" {
-  # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
-  version = "=1.28.0"
-
-subscription_id = "38a48eb9-12be-4a21-91d8-d92ce3ad56a4"
-client_id = "${var.azure_client_id}"
-client_secret = "${var.azure_client_secret}"
-tenant_id = "776ff747-970b-4a0b-96b6-9e248a307707"
+subscription_idÂ =Â "38a48eb9-12be-4a21-91d8-d92ce3ad56a4"
+client_idÂ =Â "${var.azure_client_id}"
+client_secretÂ =Â "${var.azure_client_secret}"
+tenant_idÂ =Â "776ff747-970b-4a0b-96b6-9e248a307707"
 }
 
 
-resource "azurerm_resource_group" "cicd01" {
-name = "CI-CD01"
-location = "southeastasia"
+resourceÂ "azurerm_resource_group"Â "cicd01"Â {
+nameÂ =Â "CI-CD01"
+locationÂ =Â "southeastasia"
 
-tags = {
-environment = "PoC"
+tagsÂ =Â {
+environmentÂ =Â "PoC"
 }
 }
 # Terraform Template for Creation of AKS
-resource "azurerm_kubernetes_cluster" "CICD" {
-name = "CICD-AKS"
-location = "southeastasia" 
-resource_group_name = "CI-CD01"
-dns_prefix = "cicd-aks01"
+resourceÂ "azurerm_kubernetes_cluster"Â "CICD"Â {
+nameÂ =Â "CICD-AKS"
+locationÂ =Â "southeastasia"Â 
+resource_group_nameÂ =Â "CI-CD01"
+dns_prefixÂ =Â "cicd-aks01"
 
-agent_pool_profile {
-name = "default"
-count = 1
-vm_size = "Standard_D1_v2"
-os_type = "Linux"
-os_disk_size_gb = 30
+agent_pool_profileÂ {
+nameÂ =Â "default"
+countÂ =Â 1
+vm_sizeÂ =Â "Standard_D1_v2"
+os_typeÂ =Â "Linux"
+os_disk_size_gbÂ =Â 30
 }
-service_principal {
-client_id = "${var.azure_client_id}"
-client_secret = "${var.azure_client_secret}"
+service_principalÂ {
+client_idÂ =Â "${var.azure_client_id}"
+client_secretÂ =Â "${var.azure_client_secret}"
 }
 }
 
 # Terraform Template for Creation of Application Gateway
-resource "azurerm_virtual_network" "test" {
-name = "cicdvnet"
-resource_group_name = "ci-cd01"
-location = "southeastasia"
-address_space = ["10.254.0.0/16"]
+resourceÂ "azurerm_virtual_network"Â "test"Â {
+nameÂ =Â "cicdvnet"
+resource_group_nameÂ =Â "ci-cd01"
+locationÂ =Â "southeastasia"
+address_spaceÂ =Â ["10.254.0.0/16"]
 }
 
-resource "azurerm_subnet" "frontend" {
-name = "frontend"
-resource_group_name = "ci-cd01"
-virtual_network_name = "${azurerm_virtual_network.test.name}"
-address_prefix = "10.254.0.0/24"
+resourceÂ "azurerm_subnet"Â "frontend"Â {
+nameÂ =Â "frontend"
+resource_group_nameÂ =Â "ci-cd01"
+virtual_network_nameÂ =Â "${azurerm_virtual_network.test.name}"
+address_prefixÂ =Â "10.254.0.0/24"
 }
 
-resource "azurerm_subnet" "backend" {
-name = "backend"
-resource_group_name = "ci-cd01"
-virtual_network_name = "${azurerm_virtual_network.test.name}"
-address_prefix = "10.254.2.0/24"
+resourceÂ "azurerm_subnet"Â "backend"Â {
+nameÂ =Â "backend"
+resource_group_nameÂ =Â "ci-cd01"
+virtual_network_nameÂ =Â "${azurerm_virtual_network.test.name}"
+address_prefixÂ =Â "10.254.2.0/24"
 }
 
-resource "azurerm_public_ip" "test" {
-name = "ci-cd01-pip"
-resource_group_name = "ci-cd01"
-location = "southeastasia"
-allocation_method = "Dynamic"
+resourceÂ "azurerm_public_ip"Â "test"Â {
+nameÂ =Â "ci-cd01-pip"
+resource_group_nameÂ =Â "ci-cd01"
+locationÂ =Â "southeastasia"
+allocation_methodÂ =Â "Dynamic"
 }
 
 # since these variables are re-used - a locals block makes this more maintainable
-locals {
-backend_address_pool_name = "${azurerm_virtual_network.test.name}-beap"
-frontend_port_name = "${azurerm_virtual_network.test.name}-feport"
-frontend_ip_configuration_name = "${azurerm_virtual_network.test.name}-feip"
-http_setting_name = "${azurerm_virtual_network.test.name}-be-htst"
-listener_name = "${azurerm_virtual_network.test.name}-httplstn"
-request_routing_rule_name = "${azurerm_virtual_network.test.name}-rqrt"
-redirect_configuration_name = "${azurerm_virtual_network.test.name}-rdrcfg"
+localsÂ {
+backend_address_pool_nameÂ =Â "${azurerm_virtual_network.test.name}-beap"
+frontend_port_nameÂ =Â "${azurerm_virtual_network.test.name}-feport"
+frontend_ip_configuration_nameÂ =Â "${azurerm_virtual_network.test.name}-feip"
+http_setting_nameÂ =Â "${azurerm_virtual_network.test.name}-be-htst"
+listener_nameÂ =Â "${azurerm_virtual_network.test.name}-httplstn"
+request_routing_rule_nameÂ =Â "${azurerm_virtual_network.test.name}-rqrt"
+redirect_configuration_nameÂ =Â "${azurerm_virtual_network.test.name}-rdrcfg"
 }
 
-resource "azurerm_application_gateway" "network" {
-name = "ci-cd01-appgateway"
-resource_group_name = "ci-cd01"
-location = "southeastasia"
+resourceÂ "azurerm_application_gateway"Â "network"Â {
+nameÂ =Â "ci-cd01-appgateway"
+resource_group_nameÂ =Â "ci-cd01"
+locationÂ =Â "southeastasia"
 
-sku {
-name = "Standard_Small"
-tier = "Standard"
-capacity = 2
+skuÂ {
+nameÂ =Â "Standard_Small"
+tierÂ =Â "Standard"
+capacityÂ =Â 2
 }
 
-gateway_ip_configuration {
-name = "my-gateway-ip-configuration"
-subnet_id = "${azurerm_subnet.frontend.id}"
+gateway_ip_configurationÂ {
+nameÂ =Â "my-gateway-ip-configuration"
+subnet_idÂ =Â "${azurerm_subnet.frontend.id}"
 }
 
-frontend_port {
-name = "${local.frontend_port_name}"
-port = 80
+frontend_portÂ {
+nameÂ =Â "${local.frontend_port_name}"
+portÂ =Â 80
 }
 
-frontend_ip_configuration {
-name = "${local.frontend_ip_configuration_name}"
-public_ip_address_id = "${azurerm_public_ip.test.id}"
+frontend_ip_configurationÂ {
+nameÂ =Â "${local.frontend_ip_configuration_name}"
+public_ip_address_idÂ =Â "${azurerm_public_ip.test.id}"
 }
 
-backend_address_pool {
-name = "${local.backend_address_pool_name}"
+backend_address_poolÂ {
+nameÂ =Â "${local.backend_address_pool_name}"
 }
 
-backend_http_settings {
-name = "${local.http_setting_name}"
-cookie_based_affinity = "Disabled"
-path = "/path1/"
-port = 80
-protocol = "Http"
-request_timeout = 1
+backend_http_settingsÂ {
+nameÂ =Â "${local.http_setting_name}"
+cookie_based_affinityÂ =Â "Disabled"
+pathÂ =Â "/path1/"
+portÂ =Â 80
+protocolÂ =Â "Http"
+request_timeoutÂ =Â 1
 }
 
-http_listener {
-name = "${local.listener_name}"
-frontend_ip_configuration_name = "${local.frontend_ip_configuration_name}"
-frontend_port_name = "${local.frontend_port_name}"
-protocol = "Http"
+http_listenerÂ {
+nameÂ =Â "${local.listener_name}"
+frontend_ip_configuration_nameÂ =Â "${local.frontend_ip_configuration_name}"
+frontend_port_nameÂ =Â "${local.frontend_port_name}"
+protocolÂ =Â "Http"
 }
 
-request_routing_rule {
-name = "${local.request_routing_rule_name}"
-rule_type = "Basic"
-http_listener_name = "${local.listener_name}"
-backend_address_pool_name = "${local.backend_address_pool_name}"
-backend_http_settings_name = "${local.http_setting_name}"
+request_routing_ruleÂ {
+nameÂ =Â "${local.request_routing_rule_name}"
+rule_typeÂ =Â "Basic"
+http_listener_nameÂ =Â "${local.listener_name}"
+backend_address_pool_nameÂ =Â "${local.backend_address_pool_name}"
+backend_http_settings_nameÂ =Â "${local.http_setting_name}"
 }
 }
 # Provision Container registry
-resource "azurerm_container_registry" "acr" {
-name = "cicdreg"
-resource_group_name = "ci-cd01"
-location = "southeastasia"
-sku = "Basic"
-admin_enabled = false
+resourceÂ "azurerm_container_registry"Â "acr"Â {
+nameÂ =Â "cicdreg"
+resource_group_nameÂ =Â "ci-cd01"
+locationÂ =Â "southeastasia"
+skuÂ =Â "Basic"
+admin_enabledÂ =Â false
 }
 #Provision storage account
 
-resource "azurerm_storage_account" "cicdstg" {
-name = "cicd01"
-resource_group_name = "ci-cd01"
-location = "southeastasia"
-account_tier = "Standard"
-account_replication_type = "ZRS"
+resourceÂ "azurerm_storage_account"Â "cicdstg"Â {
+nameÂ =Â "cicd01"
+resource_group_nameÂ =Â "ci-cd01"
+locationÂ =Â "southeastasia"
+account_tierÂ =Â "Standard"
+account_replication_typeÂ =Â "ZRS"
 
 } 
