@@ -1,9 +1,14 @@
-provider "azurerm" {
+provider "azurerm" {
+  # whilst the `version` attribute is optional, we recommend pinning to a given version of the Provider
+  version = "=1.28.0"
+
 subscription_id = "38a48eb9-12be-4a21-91d8-d92ce3ad56a4"
 client_id = "${var.azure_client_id}"
 client_secret = "${var.azure_client_secret}"
 tenant_id = "776ff747-970b-4a0b-96b6-9e248a307707"
 }
+
+
 resource "azurerm_resource_group" "cicd01" {
 name = "CI-CD01"
 location = "southeastasia"
