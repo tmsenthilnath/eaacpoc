@@ -27,8 +27,8 @@ os_type = "Linux"
 os_disk_size_gb = 30
 }
 service_principal {
-client_id = "cb610643-2fb8-4844-a689-700758b46b9d"
-client_secret = "b311d590-d8de-41f6-8859-1a7689c4171b"
+client_id = "${var.azure_client_id}"
+client_secret = "${var.azure_client_secret}"
 }
 }
 
