@@ -4,8 +4,7 @@ String credentialsId = 'azurecred'
 try {
   stage('checkout') {
     node {
-      cleanWs()
-      checkout scm
+         checkout scm
     }
   }
 
@@ -25,7 +24,6 @@ try {
     }
   }
 
-
   // Run terraform plan
   stage('plan') {
     node {
@@ -35,7 +33,7 @@ try {
                                     clientSecretVariable: 'CLIENT_SECRET',
                                     tenantIdVariable: 'TENANT_ID')]) 
         {
-            sh 'terraform plan'
+            sh 'terraform plan -var azure_client_id=${CLIENT_ID} -var azure_client_secret=${CLIENT_SECRET} -out=plan.out'
           }
     }
   }
@@ -51,7 +49,7 @@ try {
                                     clientSecretVariable: 'CLIENT_SECRET',
                                     tenantIdVariable: 'TENANT_ID')])  { 
          ansiColor('xterm') {
-                      sh 'terraform apply -auto-approve'
+                      sh 'terraform apply -auto-approve plan.out'
          }
         }
       }
