@@ -144,5 +144,4 @@ resource_group_name = "ci-cd01"
 location = "southeastasia"
 account_tier = "Standard"
 account_replication_type = "ZRS"
-
 } 
